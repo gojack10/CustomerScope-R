@@ -53,7 +53,12 @@ ggplot(monthly_sales_clean, aes(x = InvoiceMonth, y = Total_Sales)) +
   labs(title = "Historical Monthly Sales (Cleaned)",
        x = "Month",
        y = "Total Sales") +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  ) +
+  scale_y_continuous(labels = scales::comma)
 
 # Prepare data for Prophet
 monthly_sales_clean <- monthly_sales_clean %>%
@@ -91,7 +96,7 @@ forecast_plot_prophet <- ggplot() +
        x = "Date",
        y = "Sales") +
   theme_minimal(base_size = 15) +
-  scale_y_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = scales::comma) +  # Ensure no scientific notation
   theme(
     plot.title = element_text(hjust = 0.5),
     axis.text.x = element_text(angle = 45, hjust = 1),
@@ -102,9 +107,3 @@ forecast_plot_prophet <- ggplot() +
 # Save the improved plot
 ggsave("plots/sales_forecast_prophet.png", plot = forecast_plot_prophet)
 
-# Plot Trend Component
-prophet_plot_components(prophet_model, forecast)
-
-# Save the trend component plot
-trend_plot_name <- "plots/prophet_trend_components.png"
-ggsave(trend_plot_name, plot = last_plot())
