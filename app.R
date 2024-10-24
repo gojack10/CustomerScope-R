@@ -45,9 +45,10 @@ ui <- dashboardPage(
       tabItem(tabName = "cluster",
         fluidRow(
           box(
-            selectInput("cluster", "Select Customer Cluster:",
+            selectInput("clusters", "Select Customer Cluster(s):",
                        choices = sort(unique(customer_metrics$Cluster)),
-                       selected = unique(customer_metrics$Cluster)[1]),
+                       selected = sort(unique(customer_metrics$Cluster)[1]),  # Select first cluster by default
+                       multiple = TRUE),
             width = 12
           )
         ),
@@ -89,10 +90,17 @@ ui <- dashboardPage(
 
 # Server Definition
 server <- function(input, output) {
+  # Define a fixed color palette for clusters
+  cluster_colors <- setNames(
+    scales::hue_pal()(length(unique(customer_metrics$Cluster))),
+    sort(unique(customer_metrics$Cluster))
+  )
   
   # Reactive filtered data
   filtered_data <- reactive({
-    customer_metrics %>% filter(Cluster == input$cluster)
+    req(input$clusters)  # Ensure clusters are selected
+    customer_metrics %>% 
+      filter(Cluster %in% input$clusters)
   })
   
   # Overview Tab Outputs
@@ -125,23 +133,34 @@ server <- function(input, output) {
   
   # Cluster Analysis Tab Outputs
   output$monetaryBoxplot <- renderPlot({
+    req(filtered_data())
     ggplot(filtered_data(), aes(x = as.factor(Cluster), y = Monetary, fill = as.factor(Cluster))) +
       geom_boxplot() +
       theme_minimal() +
-      labs(title = paste("Monetary Value Distribution for Cluster", input$cluster),
-           y = "Monetary Value",
-           x = "Cluster") +
-      scale_y_continuous(labels = scales::dollar_format())
+      labs(
+        title = paste("Monetary Value Distribution for Cluster(s):", 
+                     paste(sort(input$clusters), collapse = ", ")),
+        y = "Monetary Value",
+        x = "Cluster"
+      ) +
+      scale_y_continuous(labels = scales::dollar_format()) +
+      scale_fill_manual(name = "Cluster", values = cluster_colors)  # Use fixed colors
   })
   
   output$frequencyScatter <- renderPlot({
-    ggplot(filtered_data(), aes(x = Frequency, y = Monetary)) +
-      geom_point(color = "blue", alpha = 0.6) +
+    req(filtered_data())
+    ggplot(filtered_data(), aes(x = Frequency, y = Monetary, color = as.factor(Cluster))) +
+      geom_point(alpha = 0.6) +
       theme_minimal() +
-      labs(title = paste("Frequency vs Monetary for Cluster", input$cluster),
-           x = "Frequency",
-           y = "Monetary Value") +
-      scale_y_continuous(labels = scales::dollar_format())
+      labs(
+        title = paste("Frequency vs Monetary for Cluster(s):", 
+                     paste(sort(input$clusters), collapse = ", ")),
+        x = "Frequency",
+        y = "Monetary Value",
+        color = "Cluster"
+      ) +
+      scale_y_continuous(labels = scales::dollar_format()) +
+      scale_color_manual(name = "Cluster", values = cluster_colors)  # Use fixed colors
   })
   
   # Customer Details Tab Output
@@ -172,7 +191,27 @@ server <- function(input, output) {
     forecast_plot_prophet
   })
 
-  # ... rest of server code ...
+  # Update clusterProfile
+  output$clusterProfile <- renderDataTable({
+    req(filtered_data())
+    profile_data <- filtered_data() %>%
+      group_by(Cluster) %>%
+      summarize(
+        Total_Customers = n(),
+        Avg_Monetary = mean(Monetary, na.rm = TRUE),
+        Avg_Frequency = mean(Frequency, na.rm = TRUE),
+        Avg_Recency = mean(Recency, na.rm = TRUE)
+      ) %>%
+      as.data.frame()
+    
+    datatable(
+      profile_data,
+      options = list(pageLength = 10),
+      rownames = FALSE
+    ) %>%
+      formatCurrency(columns = "Avg_Monetary") %>%
+      formatRound(columns = c("Avg_Frequency", "Avg_Recency"), digits = 2)
+  })
 }
 
 # Run the application
