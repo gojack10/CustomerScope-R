@@ -33,9 +33,12 @@ print("Merging Transactional Data with Customer Segments...")
 merged_data <- customer_data %>%
   inner_join(customer_segments, by = "CustomerID")
 
-# Display first few rows to verify
+# DEBUG
 print("Merged Data:")
 print(head(merged_data))
+print("Last few entries in merged_data:")
+print(tail(merged_data))
+
 
 # Print the range of InvoiceDate in the merged_data
 print(paste("Invoice Date Range:", 
@@ -73,3 +76,4 @@ customer_metrics <- merged_data %>%
 # Display first few rows to verify
 print("Customer Metrics:")
 print(head(customer_metrics))
+
