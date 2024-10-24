@@ -193,10 +193,24 @@ cluster_labels <- cluster_profiles %>%
 print("\nCluster Segments:")
 print(select(cluster_labels, Cluster, Segment, Size_Percentage))
 
-# Function to save customer segments to a CSV file
-save_customer_segments <- function(cluster_labels, file_path) {
-  write.csv(cluster_labels, file = file_path, row.names = FALSE)
+# Function to save cluster profiles to a CSV file
+save_cluster_profiles <- function(cluster_profiles, file_path) {
+  write.csv(cluster_profiles, file = file_path, row.names = FALSE)
 }
 
+# Function to save customer segments to a CSV file
+save_customer_segments <- function(rfm_clustered, cluster_labels, file_path) {
+  # Join the clustered data with the cluster labels
+  customer_segments <- rfm_clustered %>%
+    left_join(cluster_labels, by = "Cluster") %>%
+    select(CustomerID, Cluster, Segment)
+  
+  # Write to CSV
+  write.csv(customer_segments, file = file_path, row.names = FALSE)
+}
+
+# Save the cluster profiles to a CSV file in the /data/ folder
+save_cluster_profiles(cluster_profiles, "data/cluster_profiles.csv")
+
 # Save the customer segments to a CSV file in the /data/ folder
-save_customer_segments(cluster_labels, "data/customer_segments.csv")
+save_customer_segments(rfm_clustered, cluster_labels, "data/customer_segments.csv")
