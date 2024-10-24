@@ -192,3 +192,11 @@ cluster_labels <- cluster_profiles %>%
 # Print segment labels
 print("\nCluster Segments:")
 print(select(cluster_labels, Cluster, Segment, Size_Percentage))
+
+# Function to save customer segments to a CSV file
+save_customer_segments <- function(cluster_labels, file_path) {
+  write.csv(cluster_labels, file = file_path, row.names = FALSE)
+}
+
+# Save the customer segments to a CSV file in the /data/ folder
+save_customer_segments(cluster_labels, "data/customer_segments.csv")
