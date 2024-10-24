@@ -56,10 +56,7 @@ rfm_plots <- rfm_data %>%
        x = "Value",
        y = "Count")
 
-# Display the plot
-print(rfm_plots)
-
-# Save the plot
+# Save the plot (removed print statement)
 ggsave("plots/rfm_distributions.png", rfm_plots, width = 12, height = 6)
 
 # Elbow Method Analysis
