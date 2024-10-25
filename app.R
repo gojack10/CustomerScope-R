@@ -13,6 +13,9 @@ source("marketing/data_loading.R")
 source("customer_segmentation.R")
 source("marketing/time_series_analysis.R")
 
+# Load churn data
+churn_data <- read.csv("data/customer_churn_risk.csv")
+
 # UI Definition
 ui <- dashboardPage(
   dashboardHeader(title = "CustomerScope Analytics"),
@@ -22,6 +25,7 @@ ui <- dashboardPage(
       menuItem("Overview", tabName = "overview", icon = icon("dashboard")),
       menuItem("Cluster Analysis", tabName = "cluster", icon = icon("users")),
       menuItem("Time Series", tabName = "timeseries", icon = icon("chart-line")),
+      menuItem("Churn Analysis", tabName = "churn", icon = icon("user-minus")),
       menuItem("Customer Details", tabName = "details", icon = icon("user"))
     )
   ),
@@ -72,6 +76,22 @@ ui <- dashboardPage(
         ),
         fluidRow(
           box(plotOutput("sales_forecast"), width = 12)
+        )
+      ),
+      
+      # Churn Analysis Tab
+      tabItem(tabName = "churn",
+        fluidRow(
+          box(width = 12,
+            tabsetPanel(
+              tabPanel("Recency Analysis",
+                plotlyOutput("churn_recency", height = "800px")
+              ),
+              tabPanel("Risk Heatmap",
+                plotlyOutput("churn_heatmap", height = "800px")
+              )
+            )
+          )
         )
       ),
       
@@ -211,6 +231,110 @@ server <- function(input, output) {
     ) %>%
       formatCurrency(columns = "Avg_Monetary") %>%
       formatRound(columns = c("Avg_Frequency", "Avg_Recency"), digits = 2)
+  })
+  
+  # Create custom transformations for the heatmap
+  y_trans <- scales::trans_new(
+    name = "custom_y",
+    transform = function(x) ifelse(x <= 2, x * 5, 10),
+    inverse = function(x) ifelse(x <= 10, x/5, 2)
+  )
+
+  x_trans <- scales::trans_new(
+    name = "custom_x",
+    transform = function(x) ifelse(x <= 100, x, 100 + (x-100)/3),
+    inverse = function(x) ifelse(x <= 100, x, (x-100)*3 + 100)
+  )
+
+  # Churn Analysis Tab Outputs
+  output$churn_recency <- renderPlotly({
+    # Use all data for smoothing
+    smooth_fit <- loess(Churn_Probability ~ Recency, 
+                       data = churn_data,
+                       span = 0.75,  # ggplot2 default
+                       degree = 2)   # ggplot2 default
+    
+    pred_df <- data.frame(
+      Recency = seq(min(churn_data$Recency), 
+                    max(churn_data$Recency), 
+                    length.out = 100)
+    )
+    pred <- predict(smooth_fit, newdata = pred_df, se = TRUE)
+    
+    pred_df$fit <- pred$fit
+    pred_df$lower <- pred$fit - 1.96 * pred$se.fit
+    pred_df$upper <- pred$fit + 1.96 * pred$se.fit
+    
+    # Filter visible points only (but after smoothing calculation)
+    visible_points <- churn_data[churn_data$Churn_Probability > 0, ]
+    
+    # Create the plot
+    p <- plot_ly() %>%
+      add_trace(data = visible_points,  # Only show non-zero points
+                x = ~Recency, y = ~Churn_Probability, 
+                type = 'scatter', mode = 'markers',
+                marker = list(color = 'darkblue', opacity = 0.4),
+                name = 'Data',
+                text = ~paste("Customer ID:", CustomerID)) %>%
+      add_ribbons(data = pred_df,
+                 x = ~Recency, ymin = ~lower, ymax = ~upper,
+                 fillcolor = 'rgba(255,0,0,0.2)',
+                 line = list(color = 'transparent'),
+                 name = 'Confidence Band') %>%
+      add_lines(data = pred_df,
+               x = ~Recency, y = ~fit,
+               line = list(color = 'red'),
+               name = 'Trend') %>%
+      layout(
+        title = "Customer Recency vs Churn Risk",
+        xaxis = list(title = "Days Since Last Purchase"),
+        yaxis = list(
+          title = "Probability of Customer Churning",
+          tickformat = ".0%",
+          range = c(0, 1.05),
+          tickvals = seq(0, 1, 0.25),
+          ticktext = c("0%", "25%", "50%", "75%", "100%")
+        ),
+        height = 800
+      )
+    
+    p
+  })
+  
+  output$churn_heatmap <- renderPlotly({
+    p <- ggplot() +
+      geom_point(data = churn_data[order(churn_data$Churn_Probability),], 
+                 aes(x = Recency, 
+                     y = Transaction_Frequency,
+                     color = Churn_Probability,
+                     text = paste("Customer ID:", CustomerID)),
+                 size = 2,
+                 alpha = 0.6) +
+      scale_color_gradient2(
+        low = "blue",
+        mid = "yellow",
+        high = "red",
+        midpoint = 0.5
+      ) +
+      scale_y_continuous(
+        trans = y_trans,
+        breaks = c(0, 1, 2),
+        limits = c(0, 2)
+      ) +
+      scale_x_continuous(
+        trans = x_trans,
+        breaks = c(0, 50, 100, 200, 300, 400),
+        labels = comma
+      ) +
+      labs(title = "Customer Churn Risk Heatmap",
+           subtitle = "Higher risk customers shown in front",
+           x = "Days Since Last Purchase",
+           y = "Transaction Frequency",
+           color = "Churn\nProbability") +
+      theme_minimal() +
+      theme(legend.position = "right")
+    
+    ggplotly(p, tooltip = "text")
   })
 }
 

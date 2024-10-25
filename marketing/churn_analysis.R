@@ -12,7 +12,7 @@ theme_set(theme_minimal() + theme(
 ))
 
 # 1. Recency vs Churn Probability with improved annotations
-p1 <- ggplot(data, aes(x = Recency, y = Churn_Probability)) +
+p1 <- ggplot(data, aes(x = Recency, y = Churn_Probability, text = paste("Customer ID:", CustomerID))) +
   geom_point(alpha = 0.4, color = "darkblue") +
   geom_smooth(method = "loess", color = "red") +
   labs(title = "Customer Churn Risk Analysis",
@@ -43,7 +43,7 @@ y_trans <- scales::trans_new(
 
 x_trans <- scales::trans_new(
   name = "custom_x",
-  transform = function(x) ifelse(x <= 100, x, 100 + (x-100)/3),
+  transform = function(x) ifelse(x <= 100, red, 100 + (x-100)/3),
   inverse = function(x) ifelse(x <= 100, x, (x-100)*3 + 100)
 )
 
@@ -52,7 +52,8 @@ p2 <- ggplot() +
   geom_point(data = data[order(data$Churn_Probability),], 
              aes(x = Recency, 
                  y = Transaction_Frequency,
-                 color = Churn_Probability),
+                 color = Churn_Probability,
+                 text = paste("Customer ID:", CustomerID)),
              size = 2,
              alpha = 0.6) +
   scale_color_gradient2(
