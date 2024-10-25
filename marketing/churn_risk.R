@@ -10,13 +10,13 @@ source("marketing/data_loading.R")
 churn_data <- customer_metrics %>%
   mutate(
     # Create churn flag based on multiple factors:
-    # 1. High recency (> 180 days instead of 90)
+    # 1. High recency (> 120 days instead of 90)
     # 2. Low frequency relative to time period
     # 3. Declining monetary value
     Churn = factor(ifelse(
-      Recency > 180 & 
-      (Frequency / Recency) < 0.1 & # Less than 1 purchase per 10 days
-      Monetary < mean(Monetary), 
+      Recency > 120 &  # Reduced from 180 to 120 days
+      (Frequency / Recency) < 0.2 &  # Increased threshold: less than 1 purchase per 5 days
+      Monetary < median(Monetary),    # Using median instead of mean
       "Yes", "No")),
     
     # Normalize monetary value
