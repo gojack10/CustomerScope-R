@@ -38,7 +38,6 @@ The study utilized the online retail dataset from the UCI Machine Learning Repos
    - Scaling of RFM values for clustering accuracy
 
 The RFM features are calculated using the following approach:
-
 ```R
 rfm_data <- clean_retail_data %>%
   group_by(CustomerID) %>%
@@ -68,7 +67,7 @@ Where:
 
 ### B. Clustering Algorithms and Initial Analysis
 
-![[rfm_distributions.png]]
+![RFM Distributions](plots/rfm_distributions.png)
 
 The initial analysis of RFM metrics revealed distinct patterns in customer behavior:
 
@@ -110,7 +109,7 @@ rfm_clustered <- rfm_data %>%
 
 The optimal number of clusters was determined through two complementary methods:
 
-![[silhouette_plot.png]]
+![Silhouette Plot](plots/silhouette_plot.png)
 
 1. Silhouette Analysis:
    - Highest score at k=2 (0.89)
@@ -118,7 +117,7 @@ The optimal number of clusters was determined through two complementary methods:
    - Diminishing returns beyond k=4
    - Supports selection of 4 clusters for balance between granularity and cohesion
 
-![[elbow_plot.png]]
+![Elbow Plot](plots/elbow_plot.png)
 
 2. Elbow Method:
    - Sharp decline in within-cluster sum of squares until k=4
@@ -130,7 +129,7 @@ The optimal number of clusters was determined through two complementary methods:
 
 ### A. Segment Profiling
 
-![[cluster_summary.png]]
+![Cluster Summary](plots/cluster_summary.png)
 
 The analysis revealed four distinct clusters with unique characteristics:
 
@@ -164,7 +163,7 @@ The analysis revealed four distinct clusters with unique characteristics:
 
 ### B. Detailed Value Distribution Analysis
 
-![[boxplot_monetary_by_cluster.png]]
+![Boxplot Monetary by Cluster](plots/boxplot_monetary_by_cluster.png)
 
 The monetary value distribution across clusters reveals distinct spending patterns:
 
@@ -187,7 +186,7 @@ The monetary value distribution across clusters reveals distinct spending patter
 
 #### Recency Patterns
 
-![[histogram_recency_by_cluster.png]]
+![Histogram Recency by Cluster](plots/histogram_recency_by_cluster.png)
 
 The recency distribution highlights engagement patterns:
 
@@ -204,7 +203,7 @@ The recency distribution highlights engagement patterns:
 
 #### Value-Frequency Relationship
 
-![[scatter_frequency_vs_monetary.png]]
+![Scatter Frequency vs Monetary](plots/scatter_frequency_vs_monetary.png)
 
 The relationship between purchase frequency and monetary value reveals:
 
@@ -216,7 +215,7 @@ The relationship between purchase frequency and monetary value reveals:
 
 ### C. Churn Risk Analysis
 
-![[churn_heatmap.png]]
+![Churn Heatmap](plots/churn_heatmap.png)
 
 The study implemented a comprehensive churn risk assessment framework that revealed distinct patterns:
 
@@ -244,20 +243,19 @@ Where:
    - Show regular engagement patterns
    - Demonstrate stable purchasing behavior
 
-
 2. High-Risk Segment:
    - Display nearly 100% churn probability
    - Typically inactive for >150 days and have low or no purchases
    - Sharp transition point around 150-day mark
    - Clear separation from active customer base
 
-![[recency_vs_churn.png]]
+![Recency vs Churn](plots/recency_vs_churn.png)
 
 Further analysis of transaction patterns reveals clear clustering of high-risk customers in the low-frequency zone, while active customers show varied transaction frequencies with clear stratification between risk levels.
 
 ### D. Time Series Analysis and Forecasting
 
-![[sales_forecast_prophet.png]]
+![Sales Forecast Prophet](plots/sales_forecast_prophet.png)
 
 The Prophet forecasting model revealed several key insights:
 
