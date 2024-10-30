@@ -275,7 +275,8 @@ server <- function(input, output) {
                 type = 'scatter', mode = 'markers',
                 marker = list(color = 'darkblue', opacity = 0.4),
                 name = 'Data',
-                text = ~paste("Customer ID:", CustomerID)) %>%
+                text = ~paste("Customer ID:", CustomerID,
+                            "<br>Monetary Value: $", formatC(Monetary, format="f", digits=2, big.mark=","))) %>%
       add_ribbons(data = pred_df,
                  x = ~Recency, ymin = ~lower, ymax = ~upper,
                  fillcolor = 'rgba(255,0,0,0.2)',
@@ -307,7 +308,8 @@ server <- function(input, output) {
                  aes(x = Recency, 
                      y = Transaction_Frequency,
                      color = Churn_Probability,
-                     text = paste("Customer ID:", CustomerID)),
+                     text = paste("Customer ID:", CustomerID,
+                                "\nMonetary Value: $", formatC(Monetary, format="f", digits=2, big.mark=","))),
                  size = 2,
                  alpha = 0.6) +
       scale_color_gradient2(
