@@ -36,25 +36,36 @@ Our analysis identified four distinct customer segments:
 | Potential Loyalists | 70.54% | Moderate engagement with growth potential |
 | Average Customers | 24.46% | Occasional buyers with opportunity for engagement |
 
-## Libraries
-```R
-install.packages(c("tidyverse", "scales", "DT", "shiny", "shinydashboard", "plotly", "prophet", "cluster", "factoextra", "caret", "randomForest", "readxl", "readr", "lubridate", "ggplot2"))
-```
+## How to Run
 
-## Installation & Usage
+### Option 1: Run Directly from GitHub (Recommended)
 
-1. **Clone the Repository**
+1. **Install and load the Shiny package**:
+   ```R
+   install.packages("shiny")
+   library(shiny)
+   ```
+
+2. **Run the dashboard**:
+   ```R
+   runGitHub("CustomerScope-R", "gojack10")
+   ```
+
+### Option 2: Run Locally
+
+1. **Clone and setup**:
    ```bash
    git clone https://github.com/gojack10/CustomerScope-R
    cd CustomerScope-R
    ```
 
-2. **Install Dependencies**
-   - Open R/RStudio
-   - Run the installation code block above
-   - Install any additional dependencies if prompted
+2. **Install dependencies in R**:
+    ```R
+    install.packages(c("tidyverse", "scales", "DT", "shiny", "shinydashboard", "plotly", "prophet", "cluster", 
+    "factoextra", "caret", "randomForest", "readxl", "readr", "lubridate", "ggplot2"))
+    ```
 
-3. **Launch the Dashboard**
+3. **Launch locally**:
    ```R
    shiny::runApp()
    ```
