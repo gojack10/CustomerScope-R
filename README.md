@@ -1,50 +1,64 @@
 # CustomerScope: RFM Analytics & Strategic Segmentation
 
-A comprehensive e-commerce customer segmentation analysis using RFM (Recency, Frequency, Monetary) metrics and advanced clustering techniques. This project analyzes customer purchasing behavior to identify distinct customer segments and provide actionable marketing insights.
+A comprehensive e-commerce customer segmentation analysis using RFM (Recency, Frequency, Monetary) metrics and advanced clustering techniques. This project helps businesses understand and optimize their customer relationships through data-driven insights and actionable marketing strategies.
 
 For detailed methodology and findings, please refer to my [research paper](ecommerce_customer_segmentation_tenbosch_2024.md).
 
-## Key Features
+## Features
 
-- **RFM Analysis**: Sophisticated customer behavior analysis using:
-  - Recency (days since last purchase)
-  - Frequency (number of purchases)
-  - Monetary value (total spend)
+### Analytics & Segmentation
+- **RFM Analysis**
+  - Recency: Time since last purchase
+  - Frequency: Purchase count analysis
+  - Monetary: Customer lifetime value tracking
 
-- **Advanced Clustering**: Implementation of K-means clustering with optimal cluster determination using:
-  - Elbow Method
-  - Silhouette Analysis
+- **Advanced Clustering**
+  - K-means clustering with optimal cluster detection
+  - Elbow method for cluster optimization
+  - Silhouette analysis for cluster validation
+  - Customer behavior pattern identification
 
-- **Interactive Dashboard**: Comprehensive visualization and analysis tools including:
-  - Customer segment profiles
-  - Churn risk assessment
-  - Time series forecasting
-  - Real-time metrics
+### Interactive Dashboard
+- Real-time customer metrics
+- Segment distribution visualization
+- Churn risk prediction
+- Purchase pattern forecasting
+- Customizable reporting
 
-## Key Findings
+## Customer Segments
 
-Our analysis revealed four distinct customer segments:
+Our analysis identified four distinct customer segments:
 
-1. VIP Customers (0.30%): High-value, frequent purchasers
-2. Champions (4.70%): Consistent, engaged customers
-3. Potential Loyalists (70.54%): Moderate engagement
-4. Average Customers (24.46%): Lower engagement
+| Segment | Percentage | Characteristics |
+|---------|------------|-----------------|
+| VIP Customers | 0.30% | High-value, frequent buyers with strong loyalty |
+| Champions | 4.70% | Regular customers with consistent engagement |
+| Potential Loyalists | 70.54% | Moderate engagement with growth potential |
+| Average Customers | 24.46% | Occasional buyers with opportunity for engagement |
 
-## Technical Stack
+## Libraries
+```R
+install.packages(c("tidyverse", "scales", "DT", "shiny", "shinydashboard", "plotly", "prophet", "cluster", "factoextra", "caret", "randomForest", "readxl", "readr", "lubridate", "ggplot2"))
+```
 
-- **R**: Primary programming language
-- **Libraries**:
-  - `dplyr`: Data manipulation
-  - `ggplot2`: Data visualization
-  - `cluster`: Clustering algorithms
-  - `prophet`: Time series forecasting
-  - `shiny`: Interactive dashboard
+## Installation & Usage
 
-## Getting Started
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/gojack10/CustomerScope-R
+   cd CustomerScope-R
+   ```
 
-1. Clone the repository
-2. Install required R packages
-3. Run the Shiny dashboard
+2. **Install Dependencies**
+   - Open R/RStudio
+   - Run the installation code block above
+   - Install any additional dependencies if prompted
+
+3. **Launch the Dashboard**
+   ```R
+   shiny::runApp()
+   ```
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
